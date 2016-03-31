@@ -58,13 +58,13 @@ def cruzaUniforme(padre, madre):
 
     for i in xrange(t):
         a = numpy.random.uniform(0,1)
-        if(a < 0.5):
+        if(a > 0.5):
             hijo1[i] = padre[i]
         else:
             hijo1[i] = madre[i]
 
         a = numpy.random.uniform(0,1)
-        if(a < 0.5):
+        if(a > 0.5):
             hijo2[i] = padre[i]
         else:
             hijo2[i] = madre[i]
@@ -90,9 +90,9 @@ def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
 NUMERO_GENERACIONES = 3000
 TAMANIO_GENOMA = 100
 TAMANIO_POBLACION = 100
-MEJORES_INDIVIDUOS = 5
+MEJORES_INDIVIDUOS = 10
 PROBABILIDAD_MUTA = .01
-PROBABILIDAD_CRUZA = .99
+PROBABILIDAD_CRUZA = .9
 AGUILA = True
 SOL = False
 
@@ -582,7 +582,8 @@ def cruzaPadres(poblacion, listaPadres, probabilidadCruza):
 
     for i in range(0,poblacion.tamanio,2):
         if volado( probabilidadCruza ) == AGUILA:
-            genHijo1, genHijo2 = cruza1Punto(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            genHijo1, genHijo2 = cruzaUniforme(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            #curza1 punto, 2 puntos, uniforme y acentuada
 
             hijo1 = creaIndividuoGen(genHijo1)
             hijo2 = creaIndividuoGen(genHijo2)
@@ -706,11 +707,13 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 
     mejoresIndividuos = elitismo(poblacion, numeroMejoresIndividuos)
     calcularDatos(mejoresIndividuos)
+    listaPadres = []
     while( generacionActual < numeroGeneraciones ):
         print "\nGeneracion Actual: ", generacionActual
 
-        listaPadres = seleccionarPadres(poblacion)
-        #listaPadres = sobranteEstocasticoSR(poblacion)
+        #listaPadres = seleccionarPadres(poblacion)
+        listaPadres = sobranteEstocasticoSR(poblacion)
+        #sobranteEstocasticoCR(poblacion,listaPadres)
         nuevaPoblacion = cruzaPadres(poblacion, listaPadres, porcentajeCruza)
         mutarPoblacion(nuevaPoblacion, porcentajeMutacion)
         calcularDatos(nuevaPoblacion)
@@ -726,8 +729,8 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
         generacionActual += 1
 
 
-        for i in xrange(mejoresIndividuos.tamanio):
-            print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
+        #for i in xrange(mejoresIndividuos.tamanio):
+        #    print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
 
     """for i in xrange(MEJORES_INDIVIDUOS):
         x1, x2, x3, x4 = praxis_2_5(Elite.individuos[i].gen)
