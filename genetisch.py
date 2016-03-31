@@ -87,10 +87,10 @@ def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
     return hijo1, hijo2
 
 ###################################################################################
-NUMERO_GENERACIONES = 3000
-TAMANIO_GENOMA = 100
-TAMANIO_POBLACION = 100
-MEJORES_INDIVIDUOS = 10
+NUMERO_GENERACIONES = 12000
+TAMANIO_GENOMA = 36
+TAMANIO_POBLACION = 20
+MEJORES_INDIVIDUOS = 5
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
@@ -155,22 +155,22 @@ def praxis_1(gen):
 
 
 def praxis_2_5(gen):
-    ###################-----EJERCICIO_2_5-----########### 11 Cada x
-    entero1 = gen[0:9]
+    ###################-----EJERCICIO_2_5-----########### 11 Cada x | de 15 Cada x 9 - 6
+    entero1 = gen[0:3]
     genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[9:15]
+    decimal1 = gen[3:11]
 
-    entero2 = gen[15:24]
+    entero2 = gen[11:14]
     genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[24:30]
+    decimal2 = gen[14:22]
 
-    entero3 = gen[30:39]
+    entero3 = gen[22:25]
     genoma3 =  ''.join(str(x) for x in entero3)
-    decimal3 = gen[39:45]
+    decimal3 = gen[25:33]
 
-    entero4 = gen[45:54]
+    entero4 = gen[33:36]
     genoma4 =  ''.join(str(x) for x in entero4)
-    decimal4 = gen[54:60]
+    decimal4 = gen[36:44]
 
     ent1 = binTOint(genoma1)
     dec1 = 0.0
@@ -214,13 +214,13 @@ def praxis_2_5(gen):
     else:
         x4 = ent4+dec4
 
-    if((x1<-500) or (x1>500)):
+    if((x1<-15-12) or (x1>15.12)):
         x1 = x1*99999999
-    if((x2<-500) or (x2>500)):
+    if((x2<-15-12) or (x2>15.12)):
         x2 = x2*99999999
-    if((x3<-500) or (x3>500)):
+    if((x3<-15-12) or (x3>15.12)):
         x3 = x3*99999999
-    if((x4<-500) or (x4>500)):
+    if((x4<-15-12) or (x4>15.12)):
         x4 = x4*99999999
 
     return x1,x2,x3,x4
@@ -355,18 +355,30 @@ def letzter(gen):
 
 
 def funcionAptitud(gen):
-    unos = 0
+    """unos = 0
     for i in xrange(len(gen)):
         if gen[i] == 1:
             unos += 1
-    return unos
-    """x1,x2,x3,x4 = praxis_2(gen) praxis_2
+    return unos"""
+    """a1 = [-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32]
+    a2 = [-32,-32,-32,-32,-32,-16,-16,-16,-16,-16,0,0,0,0,0,16,16,16,16,16,32,32,32,32,32]
+
+    a = a1,a2
+    x1,x2 = praxis_1(gen)
+
+    fx =0.002
+    for i in range(1,26):
+        fx += 1/(i + pow((x1 - a[0][i-1]),6) + pow((x2 - a[1][i-1]),6))
+    fx = 1/fx
+    return fx*(-1)"""
+
+    x1,x2,x3,x4 = praxis_2_5(gen)
     x = x1,x2,x3,x4
-    x = praxis_2(gen)
+
     fx = 10.0*4
     for i in range(1,5):
         fx += (pow(x[i-1],2) - 10*math.cos(2*math.pi*x[i-1]))
-    return fx*(-1.0)"""
+    return fx*(-1.0)
     """x1,x2 = praxis_3(gen)
     fx = 0.5 + ( (pow( math.sin(pow(x1,2)-pow(x2,2)),2 ) - 0.5)/( pow( 1 + 0.001*(pow(x1,2)+pow(x2,2)) ,2) ) )
     return fx*(-1)"""
@@ -426,8 +438,8 @@ def calcularMedia(poblacion):
 def calcularEsperanza(poblacion):
     poblacion.esperanzas = [] # Para limpiar esperanzas antes calculadas
     for i in xrange(poblacion.tamanio):
-        #poblacion.individuos[i].esperanza = 1 - poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
-        poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
+        poblacion.individuos[i].esperanza = (1 - poblacion.individuos[i].aptitud)/poblacion.media #Agrega la esperanza a c/ Individuo
+        #poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
         poblacion.esperanzas.append(poblacion.individuos[i].esperanza) #Agrega las esperanzas de los individuos a la lista de la poblacion
 
 
@@ -709,7 +721,7 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
     calcularDatos(mejoresIndividuos)
     listaPadres = []
     while( generacionActual < numeroGeneraciones ):
-        print "\nGeneracion Actual: ", generacionActual
+        #print "\nGeneracion Actual: ", generacionActual
 
         #listaPadres = seleccionarPadres(poblacion)
         listaPadres = sobranteEstocasticoSR(poblacion)
@@ -731,22 +743,17 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 
         #for i in xrange(mejoresIndividuos.tamanio):
         #    print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
-
-    """for i in xrange(MEJORES_INDIVIDUOS):
+    for i in xrange(MEJORES_INDIVIDUOS):
         x1, x2, x3, x4 = praxis_2_5(Elite.individuos[i].gen)
-        print Elite.individuos[i].aptitud, "\t|",x1,"\t\t|",x2,"\t\t|",x3,"\t\t|",x4"""
+        print Elite.individuos[i].aptitud, "\t|",x1,"\t\t|",x2,"\t\t|",x3,"\t\t|",x4
     """for i in xrange(MEJORES_INDIVIDUOS):
         x1,x2 = praxis_1(Elite.individuos[i].gen)
         print Elite.individuos[i].aptitud, "\t|",x1,"\t\t|",x2"""
-    print "----------------------- LOS MEJORES------------------------------"
-    for i in xrange(mejoresIndividuos.tamanio):
-        print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
+
 
 
 def main():
     algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
-
-
 
 
 main()
