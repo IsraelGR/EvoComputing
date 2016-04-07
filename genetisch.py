@@ -87,10 +87,10 @@ def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
     return hijo1, hijo2
 
 ###################################################################################
-NUMERO_GENERACIONES = 18000
+NUMERO_GENERACIONES = 14268
 TAMANIO_GENOMA = 75
-TAMANIO_POBLACION = 32
-MEJORES_INDIVIDUOS = 10
+TAMANIO_POBLACION = 120
+MEJORES_INDIVIDUOS = 20
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
@@ -108,9 +108,9 @@ def intTObin(integer):
 def binTOint(listGen):
     binario = ''.join(str(e) for e in listGen)
 
-    if (int(binario[0]) == 1):
+    """if (int(binario[0]) == 1):
         binario = binario[:0] + binario[(0+1):]
-        return int(binario, 2)*-1
+        return int(binario, 2)*-1"""
     return int(binario,2)
 
 
@@ -158,19 +158,19 @@ def praxis_2_5(gen):
     ###################-----EJERCICIO_2_5-----########### 15 Cada x 12mil | de 15 Cada x 9 - 6
     entero1 = gen[0:10]
     genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[10:15]
+    decimal1 = gen[10:11]
 
-    entero2 = gen[15:25]
+    entero2 = gen[11:21]
     genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[25:30]
+    decimal2 = gen[21:22]
 
-    entero3 = gen[30:40]
+    entero3 = gen[22:32]
     genoma3 =  ''.join(str(x) for x in entero3)
-    decimal3 = gen[40:45]
+    decimal3 = gen[32:33]
 
-    entero4 = gen[45:55]
+    entero4 = gen[33:43]
     genoma4 =  ''.join(str(x) for x in entero4)
-    decimal4 = gen[55:60]
+    decimal4 = gen[43:44]
 
     ent1 = binTOint(genoma1)
     dec1 = 0.0
@@ -215,26 +215,26 @@ def praxis_2_5(gen):
         x4 = ent4+dec4
 
     if((x1<-500) or (x1>500)):
-        x1 = x1*99999999
+        x1 = x1*99
     if((x2<-500) or (x2>500)):
-        x2 = x2*99999999
+        x2 = x2*99
     if((x3<-500) or (x3>500)):
-        x3 = x3*99999999
+        x3 = x3*99
     if((x4<-500) or (x4>500)):
-        x4 = x4*99999999
+        x4 = x4*99
 
     return x1,x2,x3,x4
 
 
 def praxis_3_4_7(gen):
     ###################-----EJERCICIO_3_y_4-----########### 18 Cada X
-    entero1 = gen[0:4]
+    entero1 = gen[0:5]
     genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[4:10]
+    decimal1 = gen[5:10]
 
-    entero2 = gen[10:14]
+    entero2 = gen[10:15]
     genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[14:20]
+    decimal2 = gen[15:20]
 
     ent1 = binTOint(genoma1)
     dec1 = 0.0
@@ -259,9 +259,9 @@ def praxis_3_4_7(gen):
         x2 = ent2+dec2
 
     if((x1<-10) or (x1>10)):
-        x1 = x1*99999999
+        x1 = x1*99
     if((x2<-10) or (x2>10)):
-        x2 = x2*99999999
+        x2 = x2*99
 
     return x1,x2
 
@@ -351,17 +351,6 @@ def letzter(gen):
     if((x5<1) or (x5>60)):
         x5 = x5*9
 
-    if((x1<0)):
-        x1 = x1*(-1)
-    if((x2<0)):
-        x2 = x2*(-1)
-    if((x3<0)):
-        x3 = x3*(-1)
-    if((x4<0)):
-        x4 = x4*(-1)
-    if((x5<0)):
-        x5 = x5*(-1)
-
     return x1,x2,x3,x4,x5
 
 
@@ -389,9 +378,11 @@ def funcionAptitud(gen):
     for i in range(1,5):
         fx += (pow(x[i-1],2) - 10*math.cos(2*math.pi*x[i-1]))
     return fx*(-1.0)"""
+
     """x1,x2 = praxis_3_4_7(gen)
     fx = 0.5 + ( (pow( math.sin(pow(x1,2)-pow(x2,2)),2 ) - 0.5)/( pow( 1 + (0.001*(pow(x1,2)+pow(x2,2))) ,2) ) )
     return fx*(-1)"""
+
     """x1,x2 = praxis_3_4_7(gen)
     fx = (  0.5 + ((math.cos( math.sin( abs( pow(x1,2)-pow(x2,2) ))) - 0.5)/(pow( (1 + 0.001*(pow(x1,2)+pow(x2,2)) ) ,2))  ))
     return fx*(-1)"""
@@ -416,12 +407,12 @@ def funcionAptitud(gen):
     x1,x2,x3,x4,x5 = letzter(gen)
     for i in range(1,25):
         t.append((0.1)*(i-1))
-        y.append( 53.81*(pow(1.27,t[i-1]))*math.tanh((3.012*t[i-1]) + (math.sin(2.13*t[i-1])))*math.cos(math.exp(0.507)*t[i-1]) )
+        y.append( 53.81*(pow(1.27,t[i-1]))*math.tanh(math.degrees((3.012*t[i-1])) + (math.sin(math.degrees(2.13*t[i-1]))))*math.cos(math.degrees(math.exp(0.507)*t[i-1])) )
         #Transformar de grados a radianes si la solucion no se acerca a 0
     for i in range(1,25):
-        fx += pow(((x1*pow(x2,t[i-1]))*math.tanh( (x3*t[i-1])+math.sin(x4*t[i-1]) )*math.cos(t[i-1]*math.exp(x5)) - y[i-1]), 2 )
+        fx += pow(((x1*pow(x2,t[i-1]))*math.tanh( math.degrees((x3*t[i-1])+math.sin(x4*t[i-1])) )*math.cos(math.degrees(t[i-1]*math.exp(x5))) - y[i-1]), 2 )
 
-    return fx
+    return fx*(-1)
 
 
 def creaGen(tamanio):
@@ -605,7 +596,7 @@ def cruzaPadres(poblacion, listaPadres, probabilidadCruza):
 
     for i in range(0,poblacion.tamanio,2):
         if volado( probabilidadCruza ) == AGUILA:
-            genHijo1, genHijo2 = cruzaUniforme(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            genHijo1, genHijo2 = cruza1Punto(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
             #curza1 punto, 2 puntos, uniforme y acentuada
 
             hijo1 = creaIndividuoGen(genHijo1)
@@ -732,7 +723,7 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
     calcularDatos(mejoresIndividuos)
     listaPadres = []
     while( generacionActual < numeroGeneraciones ):
-        print "\nGeneracion Actual: ", generacionActual
+        #print "\nGeneracion Actual: ", generacionActual
 
         #listaPadres = seleccionarPadres(poblacion)
         listaPadres = sobranteEstocasticoSR(poblacion)
@@ -755,11 +746,11 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
         #for i in xrange(mejoresIndividuos.tamanio):
         #    print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
     for i in xrange(MEJORES_INDIVIDUOS):
-        x1, x2, x3, x4, x5 = letzter(Elite.individuos[i].gen)
-        print Elite.individuos[i].aptitud, "\t|",x1,"\t\t|",x2,"\t\t|",x3,"\t\t|",x4,"\t\t|",x5
+        x1, x2, x3, x4,x5 = letzter(Elite.individuos[i].gen)
+        print Elite.individuos[i].aptitud*(-1), "\t|",x1,"\t\t|",x2,"\t\t|",x3,"\t\t|",x4,"\t\t|",x5
     """for i in xrange(MEJORES_INDIVIDUOS):
         x1,x2 = praxis_3_4_7(Elite.individuos[i].gen)
-        print Elite.individuos[i].aptitud, "\t|",x1,"\t\t|",x2"""
+        print Elite.individuos[i].aptitud*(-1), "\t|",x1,"\t\t|",x2"""
 
 
 
