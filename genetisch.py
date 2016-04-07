@@ -87,9 +87,9 @@ def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
     return hijo1, hijo2
 
 ###################################################################################
-NUMERO_GENERACIONES = 14268
+NUMERO_GENERACIONES = 10000
 TAMANIO_GENOMA = 75
-TAMANIO_POBLACION = 120
+TAMANIO_POBLACION = 1200
 MEJORES_INDIVIDUOS = 20
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
@@ -723,7 +723,7 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
     calcularDatos(mejoresIndividuos)
     listaPadres = []
     while( generacionActual < numeroGeneraciones ):
-        #print "\nGeneracion Actual: ", generacionActual
+        print "\nGeneracion Actual: ", generacionActual
 
         #listaPadres = seleccionarPadres(poblacion)
         listaPadres = sobranteEstocasticoSR(poblacion)
