@@ -87,341 +87,99 @@ def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
     return hijo1, hijo2
 
 ###################################################################################
-NUMERO_GENERACIONES = 5000
-TAMANIO_GENOMA = 44
-TAMANIO_POBLACION = 42
-MEJORES_INDIVIDUOS = 10
+NUMERO_GENERACIONES = 156
+TAMANIO_CUADRADO = 3
+TAMANIO_POBLACION = 36
+MEJORES_INDIVIDUOS = 5
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
 SOL = False
 
 
-
-def intTObin(integer):
-    binario = bin(integer).replace('0b','').replace('-','')
-    if (integer < 0):
-        return '1'+binario
-    return '0'+binario
-
-
-def binTOint(listGen):
-    binario = ''.join(str(e) for e in listGen)
-
-    if (int(binario[0]) == 1):
-        binario = binario[:0] + binario[(0+1):]
-        return int(binario, 2)*-1
-    return int(binario,2)
-
-
-def praxis_1(gen):
-    ###################-----EJERCICIO_1-----########### 18 Cada X 18mil generaciones
-    entero1 = gen[0:8]
-    genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[8:18]
-
-    entero2 = gen[18:26]
-    genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[26:36]
-
-    ent1 = binTOint(genoma1)
-    dec1 = 0.0
-    ent2 = binTOint(genoma2)
-    dec2 = 0.0
-
-    for i in range(1,11):
-        if( decimal1[i-1] == 1 ):
-            dec1 += 1.0/pow(2,i)
-
-    for i in range(1,11):
-        if( decimal2[i-1] == 1 ):
-            dec2 += 1.0/pow(2,i)
-
-    if( ent1<0 ):
-        x1 = ent1-dec1
-    else:
-        x1 = ent1+dec1
-    if( ent2<0 ):
-        x2 = ent2-dec2
-    else:
-        x2 = ent2+dec2
-
-    if((x1<-65.536) or (x1>65.536)):
-        x1 = x1*99999999
-    if((x2<-65.536) or (x2>65.536)):
-        x2 = x2*99999999
-
-    return x1,x2
-
-
-def praxis_2_5(gen):
-    ###################-----EJERCICIO_2_5-----########### 15 Cada x 12mil | de 15 Cada x 9 - 6
-    entero1 = gen[0:10]
-    genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[10:11]
-
-    entero2 = gen[11:21]
-    genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[21:22]
-
-    entero3 = gen[22:32]
-    genoma3 =  ''.join(str(x) for x in entero3)
-    decimal3 = gen[32:33]
-
-    entero4 = gen[33:43]
-    genoma4 =  ''.join(str(x) for x in entero4)
-    decimal4 = gen[43:44]
-
-    ent1 = binTOint(genoma1)
-    dec1 = 0.0
-    ent2 = binTOint(genoma2)
-    dec2 = 0.0
-    ent3 = binTOint(genoma3)
-    dec3 = 0.0
-    ent4 = binTOint(genoma4)
-    dec4 = 0.0
-
-    for i in range(1,len(decimal1)):
-        if( decimal1[i-1] == 1 ):
-            dec1 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal2)):
-        if( decimal2[i-1] == 1 ):
-            dec2 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal3)):
-        if( decimal3[i-1] == 1 ):
-            dec3 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal4)):
-        if( decimal4[i-1] == 1 ):
-            dec4 += 1.0/pow(2,i)
-
-    if( ent1<0 ):
-        x1 = ent1-dec1
-    else:
-        x1 = ent1+dec1
-    if( ent2<0 ):
-        x2 = ent2-dec2
-    else:
-        x2 = ent2+dec2
-    if( ent3<0 ):
-        x3 = ent3-dec3
-    else:
-        x3 = ent3+dec3
-    if( ent4<0 ):
-        x4 = ent4-dec4
-    else:
-        x4 = ent4+dec4
-
-    if((x1<-500) or (x1>500)):
-        x1 = x1*99
-    if((x2<-500) or (x2>500)):
-        x2 = x2*99
-    if((x3<-500) or (x3>500)):
-        x3 = x3*99
-    if((x4<-500) or (x4>500)):
-        x4 = x4*99
-
-    return x1,x2,x3,x4
-
-
-def praxis_3_4_7(gen):
-    ###################-----EJERCICIO_3_y_4-----########### 18 Cada X
-    entero1 = gen[0:5]
-    genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[5:10]
-
-    entero2 = gen[10:15]
-    genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[15:20]
-
-    ent1 = binTOint(genoma1)
-    dec1 = 0.0
-    ent2 = binTOint(genoma2)
-    dec2 = 0.0
-
-    for i in range(1,len(decimal1)):
-        if( decimal1[i-1] == 1 ):
-            dec1 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal2)):
-        if( decimal2[i-1] == 1 ):
-            dec2 += 1.0/pow(2,i)
-
-    if( ent1<0 ):
-        x1 = ent1-dec1
-    else:
-        x1 = ent1+dec1
-    if( ent2<0 ):
-        x2 = ent2-dec2
-    else:
-        x2 = ent2+dec2
-
-    if((x1<-10) or (x1>10)):
-        x1 = x1*99
-    if((x2<-10) or (x2>10)):
-        x2 = x2*99
-
-    return x1,x2
-
-
-def letzter(gen):
-    ###################-----EJERCICIO_2_5-----########### 11 Cada x
-    entero1 = gen[0:6]
-    genoma1 =  ''.join(str(x) for x in entero1)
-    decimal1 = gen[6:15]
-
-    entero2 = gen[15:21]
-    genoma2 =  ''.join(str(x) for x in entero2)
-    decimal2 = gen[21:30]
-
-    entero3 = gen[30:36]
-    genoma3 =  ''.join(str(x) for x in entero3)
-    decimal3 = gen[36:45]
-
-    entero4 = gen[45:51]
-    genoma4 =  ''.join(str(x) for x in entero4)
-    decimal4 = gen[51:60]
-
-    entero5 = gen[60:66]
-    genoma5 =  ''.join(str(x) for x in entero4)
-    decimal5 = gen[66:75]
-
-    ent1 = binTOint(genoma1)
-    dec1 = 0.0
-    ent2 = binTOint(genoma2)
-    dec2 = 0.0
-    ent3 = binTOint(genoma3)
-    dec3 = 0.0
-    ent4 = binTOint(genoma4)
-    dec4 = 0.0
-    ent5 = binTOint(genoma4)
-    dec5 = 0.0
-
-    for i in range(1,len(decimal1)):
-        if( decimal1[i-1] == 1 ):
-            dec1 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal2)):
-        if( decimal2[i-1] == 1 ):
-            dec2 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal3)):
-        if( decimal3[i-1] == 1 ):
-            dec3 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal4)):
-        if( decimal4[i-1] == 1 ):
-            dec4 += 1.0/pow(2,i)
-
-    for i in range(1,len(decimal5)):
-        if( decimal5[i-1] == 1 ):
-            dec5 += 1.0/pow(2,i)
-
-    if( ent1<0 ):
-        x1 = ent1-dec1
-    else:
-        x1 = ent1+dec1
-    if( ent2<0 ):
-        x2 = ent2-dec2
-    else:
-        x2 = ent2+dec2
-    if( ent3<0 ):
-        x3 = ent3-dec3
-    else:
-        x3 = ent3+dec3
-    if( ent4<0 ):
-        x4 = ent4-dec4
-    else:
-        x4 = ent4+dec4
-    if( ent4<0 ):
-        x5 = ent5-dec5
-    else:
-        x5 = ent5+dec5
-
-    if((x1<1) or (x1>60)):
-        x1 = x1*9
-    if((x2<1) or (x2>60)):
-        x2 = x2*9
-    if((x3<1) or (x3>60)):
-        x3 = x3*9
-    if((x4<1) or (x4>60)):
-        x4 = x4*9
-    if((x5<1) or (x5>60)):
-        x5 = x5*9
-
-    return x1,x2,x3,x4,x5
-
-
 def funcionAptitud(gen):
-    """unos = 0
-    for i in xrange(len(gen)):
-        if gen[i] == 1:
-            unos += 1
-    return unos"""
-    """a1 = [-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32,-32,-16,0,16,32]
-    a2 = [-32,-32,-32,-32,-32,-16,-16,-16,-16,-16,0,0,0,0,0,16,16,16,16,16,32,32,32,32,32]
-
-    a = a1,a2
-    x1,x2 = praxis_1(gen)
-
-    fx =0.002
-    for i in range(1,26):
-        fx += 1/(i + pow((x1 - a[0][i-1]),6) + pow((x2 - a[1][i-1]),6))
-    fx = 1/fx
-    return fx*(-1)"""
-
-    """x1,x2,x3,x4 = praxis_2_5(gen)
-    x = x1,x2,x3,x4
-    fx = 10.0*4
-    for i in range(1,5):
-        fx += (pow(x[i-1],2) - 10*math.cos(2*math.pi*x[i-1]))
-    return fx*(-1.0)"""
-
-    """x1,x2 = praxis_3_4_7(gen)
-    fx = 0.5 + ( (pow( math.sin(pow(x1,2)-pow(x2,2)),2 ) - 0.5)/( pow( 1 + (0.001*(pow(x1,2)+pow(x2,2))) ,2) ) )
-    return fx*(-1)"""
-
-    """x1,x2 = praxis_3_4_7(gen)
-    fx = (  0.5 + ((math.cos( math.sin( abs( pow(x1,2)-pow(x2,2) ))) - 0.5)/(pow( (1 + 0.001*(pow(x1,2)+pow(x2,2)) ) ,2))  ))
-    return fx*(-1)"""
-    x1,x2,x3,x4 = praxis_2_5(gen)
-    x = x1,x2,x3,x4
-    fx = 418.9829*4
-    for i in range(1,5):
-        fx -= x[i-1]*math.sin(math.sqrt(abs(x[i-1])))
-    return fx
-    """x1,x2 = praxis_3_4_7(gen)
-    fx = 0.0
-    fx1 = 0.0
-    fx2 = 0.0
-    for i in range(1,6):
-        fx1 += ( i*math.cos(((i+1)*x1)+i) )
-        fx2 += ( i*math.cos(((i+1)*x2)+i) )
-    fx = fx1*fx2
-    return fx*(-1)"""
-    """t = []
-    y = []
-    fx = 0.0
-    x1,x2,x3,x4,x5 = letzter(gen)
-    for i in range(1,25):
-        t.append((0.1)*(i-1))
-        y.append( 53.81*(pow(1.27,t[i-1]))*math.tanh(math.degrees((3.012*t[i-1])) + (math.sin(math.degrees(2.13*t[i-1]))))*math.cos(math.degrees(math.exp(0.507)*t[i-1])) )
-        #Transformar de grados a radianes si la solucion no se acerca a 0
-    for i in range(1,25):
-        fx += pow(((x1*pow(x2,t[i-1]))*math.tanh( math.degrees((x3*t[i-1])+math.sin(x4*t[i-1])) )*math.cos(math.degrees(t[i-1]*math.exp(x5))) - y[i-1]), 2 )
-
-    return fx*(-1)"""
+    return
 
 
 def creaGen(tamanio):
-    genotipo = [-1]*tamanio
+    cuadrado = pow(tamanio,2)
+    genotipo = []
+    option = numpy.random.randint(0,3)
 
-    for i in xrange(tamanio):
-        genotipo[i] = numpy.random.randint(0,2)%2
+    for i in xrange(cuadrado):
+        if option == 0:
+            genotipo.append(i+1)
+        elif option == 1:
+            genotipo.append(pow(tamanio,2)-i)
+        elif option == 2:
+            genotipo.append(i+1)
+            numpy.random.shuffle(genotipo)
 
     return genotipo
+
+
+def ordered_CrossOver(padre, madre):
+    tamanioPadre = len(padre)
+
+    comienza = seleccionarPosicionAleatoria(tamanioPadre)
+    longitud = numpy.random.randint(0,tamanioPadre+1) + comienza
+    hijo1 = creaHijo(tamanioPadre)
+    for i in range(comienza,longitud):
+        hijo1[i%tamanioPadre] = padre[i%tamanioPadre]
+
+    comienza = seleccionarPosicionAleatoria(tamanioPadre)
+    longitud = numpy.random.randint(0,tamanioPadre+1) + comienza
+    hijo2 = creaHijo(tamanioPadre)
+    for i in range(comienza,longitud):
+        hijo2[i%tamanioPadre] = madre[i%tamanioPadre]
+
+    for i in xrange(tamanioPadre):
+        if( madre[i] not in hijo1 ):
+            hijo1[hijo1.index(-1)] = madre[i]
+
+        if( padre[i] not in hijo2 ):
+            hijo2[hijo2.index(-1)] = padre[i]
+
+    return hijo1,hijo2
+
+
+def PMX(padre, madre):
+    tamanioPadres = len(padre)
+
+    #Mapea las posiciones elegidas de los padres a los hijos
+    comienza = seleccionarPosicionAleatoria(tamanioPadres)
+    longitud = numpy.random.randint(0,tamanioPadres+1)
+    termina = longitud+comienza
+    hijo1 = creaHijo(tamanioPadres)
+    print comienza, longitud
+    for i in range(comienza,termina):
+        hijo1[i%tamanioPadres] = madre[i%tamanioPadres]
+
+    hijo2 = creaHijo(tamanioPadres)
+    comienza = seleccionarPosicionAleatoria(tamanioPadres)
+    termina = longitud+comienza
+    print comienza, longitud
+    for i in range(comienza, termina):
+        hijo2[i%tamanioPadres] = padre[i%tamanioPadres]
+
+    print hijo1, hijo2
+
+    for i in xrange(tamanioPadres):
+        if((padre[i] not in hijo1)and(hijo1[i] == -1)):
+            hijo1[i] = padre[i]
+        if((madre[i] not in hijo2)and(hijo2[i] == -1)):
+            hijo2[i] = madre[i]
+
+
+    return hijo1, hijo2
+
+
+
+
+
+
+
+
 
 
 def calcularPM(cromosoma):
@@ -440,7 +198,7 @@ def calcularMedia(poblacion):
 def calcularEsperanza(poblacion):
     poblacion.esperanzas = [] # Para limpiar esperanzas antes calculadas
     for i in xrange(poblacion.tamanio):
-        poblacion.individuos[i].esperanza = (1 - poblacion.individuos[i].aptitud)/poblacion.media #Agrega la esperanza a c/ Individuo
+        poblacion.individuos[i].esperanza = (1- poblacion.individuos[i].aptitud)/poblacion.media #Agrega la esperanza a c/ Individuo
         #poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
         poblacion.esperanzas.append(poblacion.individuos[i].esperanza) #Agrega las esperanzas de los individuos a la lista de la poblacion
 
@@ -755,7 +513,10 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 
 
 def main():
-    algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
-
+    #algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
+    padre = [1,3,5,7,9,2,4,6,8]
+    madre = [1,2,3,4,5,6,7,8,9]
+    print padre, madre
+    print PMX(padre, madre)
 
 main()
