@@ -15,83 +15,12 @@ def clonar(padre):
 def seleccionarPosicionAleatoria(tamanio):
     return numpy.random.randint(tamanio)
 
-
-def cruza1Punto(padre, madre):
-    t = len(padre)
-    i = seleccionarPosicionAleatoria(t)
-    hijo1 = creaHijo(t)
-    hijo2 = creaHijo(t)
-
-    hijo1[0:i] = padre[0:i]
-    hijo2[0:i] = madre[0:i]
-    hijo1[i:t] = madre[i:t]
-    hijo2[i:t] = padre[i:t]
-
-    return hijo1, hijo2
-
-
-def cruza2Punto(padre, madre):
-    t = len(padre)
-    i = seleccionarPosicionAleatoria(t)
-    j= seleccionarPosicionAleatoria(t)
-    hijo1 = creaHijo(t)
-    hijo2 = creaHijo(t)
-
-    if(i > j):
-        i, j = j, i
-
-
-    hijo1[0:i] = padre[0:i]
-    hijo2[0:i] = madre[0:i]
-    hijo1[i:j] = madre[i:j]
-    hijo2[i:j] = padre[i:j]
-    hijo1[j:t] = padre[j:t]
-    hijo2[j:t] = madre[j:t]
-
-    return hijo1, hijo2
-
-
-def cruzaUniforme(padre, madre):
-    t = len(padre)
-    hijo1 = creaHijo(t)
-    hijo2 = creaHijo(t)
-
-    for i in xrange(t):
-        a = numpy.random.uniform(0,1)
-        if(a > 0.5):
-            hijo1[i] = padre[i]
-        else:
-            hijo1[i] = madre[i]
-
-        a = numpy.random.uniform(0,1)
-        if(a > 0.5):
-            hijo2[i] = padre[i]
-        else:
-            hijo2[i] = madre[i]
-
-    return hijo1, hijo2
-
-
-def cruzaAcentuada(padre, madre, d): #d es el numero de alelos a cambiar
-    t = len(padre)
-    hijo1 = clonar(padre)
-    hijo2 = clonar(madre)
-
-    for i in xrange(d):
-        p = seleccionarPosicionAleatoria(t)
-        hijo1[p] = madre[p]
-
-        p = seleccionarPosicionAleatoria(t)
-        hijo2[p] = padre[p]
-
-    return hijo1, hijo2
-
 ###################################################################################
 NUMERO_GENERACIONES = 156
 TAMANIO_CUADRADO = 3
 TAMANIO_POBLACION = 36
 MEJORES_INDIVIDUOS = 5
-PROBABILIDAD_MUTA = .01
+PROBABILIDAD_MUTA = .1
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
 SOL = False
@@ -151,67 +80,90 @@ def PMX(padre, madre):
     longitud = numpy.random.randint(0,tamanioPadres+1)
     termina = longitud+comienza
     hijo1 = creaHijo(tamanioPadres)
-    print comienza, longitud
     for i in range(comienza,termina):
         hijo1[i%tamanioPadres] = madre[i%tamanioPadres]
 
     hijo2 = creaHijo(tamanioPadres)
     comienza = seleccionarPosicionAleatoria(tamanioPadres)
     termina = longitud+comienza
-    print comienza, longitud
     for i in range(comienza, termina):
         hijo2[i%tamanioPadres] = padre[i%tamanioPadres]
 
-    print hijo1, hijo2
-
+    #Mapea los datos de los padres a los hijos excepto los valores del mapeo anterior
+    noEstadoH1 = []
+    noEstadoH2 = []
     for i in xrange(tamanioPadres):
         if((padre[i] not in hijo1)and(hijo1[i] == -1)):
             hijo1[i] = padre[i]
         if((madre[i] not in hijo2)and(hijo2[i] == -1)):
             hijo2[i] = madre[i]
+        #Guardamos el indice para despues hacer un shuffle y poner los valores en estos lugares
+        if( hijo1[i] == -1 ):
+            noEstadoH1.append(i)
+        if( hijo2[i] == -1 ):
+            noEstadoH2.append(i)
+
+    #Acomodamos los numeros restantes en las posiciones vacias y de manera aleatoria
+    numpy.random.shuffle(noEstadoH1)
+    numpy.random.shuffle(noEstadoH2)
+    posi1 = 0
+    posi2 = 0
+
+    for dato in range(1,tamanioPadres+1):
+        if(dato not in hijo1)and(posi1 <= len(noEstadoH1)):
+            hijo1[noEstadoH1[posi1]] = dato
+            posi1 += 1
+        if(dato not in hijo2)and(posi2 <= len(noEstadoH2)):
+            hijo2[noEstadoH2[posi2]] = dato
+            posi2 += 1
+
+    return hijo1, hijo2
+
+
+def positionBased_CO(padre, madre):
+    tamanioPadres = len(padre)
+    tam_conjunto = numpy.random.randint(1,tamanioPadres+1) #Tamanio del conjunto a agarrar
+    posiciones1 = []
+    posiciones2 = []
+    hijo1 = creaHijo(tamanioPadres)
+    hijo2 = creaHijo(tamanioPadres)
+
+    #Guardo las posiciones en las que se va a mapear los datos
+    for i in range(0,tam_conjunto):
+        dato1 = seleccionarPosicionAleatoria(tam_conjunto)
+        dato2 = seleccionarPosicionAleatoria(tam_conjunto)
+        if( dato1 not in posiciones1 ):
+            posiciones1.append(dato1)
+        if( dato2 not in posiciones2 ):
+            posiciones2.append(dato2)
+
+    print posiciones1
+    print posiciones2
+    #Se mapean los datos del arreglo posiciones de padre
+    for i in xrange(len(posiciones1)):
+        hijo1[posiciones1[i]] = padre[posiciones1[i]]
+    for i in xrange(len(posiciones2)):
+        hijo2[posiciones2[i]] = madre[posiciones2[i]]
+
+
+    #Se llena el gen con los datos faltantes de madre
+    for i in xrange(tamanioPadres):
+        if( madre[i] not in hijo1 ):
+            hijo1[hijo1.index(-1)] = madre[i]
+        if( padre[i] not in hijo2 ):
+            hijo2[hijo2.index(-1)] = padre[i]
 
 
     return hijo1, hijo2
 
 
+def MutaPermxInt(genoma, probabilidadMuta):
+    if(volado(probabilidadMuta)):
+        posocion1 = numpy.random.randint(0,len(genoma))
+        posocion2 = numpy.random.randint(0,len(genoma))
+        print posocion1,posocion2
+        genoma[posocion1], genoma[posocion2] = genoma[posocion2], genoma[posocion1]
 
-
-
-
-
-
-
-
-def calcularPM(cromosoma):
-    return 1.0/len(cromosoma)
-
-
-def calcularMedia(poblacion):
-    sumaAptitudes = 0
-
-    for i in xrange(poblacion.tamanio):
-        sumaAptitudes += poblacion.individuos[i].aptitud
-
-    return (1.0/poblacion.tamanio)*sumaAptitudes
-
-
-def calcularEsperanza(poblacion):
-    poblacion.esperanzas = [] # Para limpiar esperanzas antes calculadas
-    for i in xrange(poblacion.tamanio):
-        poblacion.individuos[i].esperanza = (1- poblacion.individuos[i].aptitud)/poblacion.media #Agrega la esperanza a c/ Individuo
-        #poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
-        poblacion.esperanzas.append(poblacion.individuos[i].esperanza) #Agrega las esperanzas de los individuos a la lista de la poblacion
-
-
-def calcularDatos(poblacion):
-    poblacion.tamanio = len(poblacion.individuos)
-
-    for i in xrange(poblacion.tamanio):
-        poblacion.individuos[i].aptitud = funcionAptitud(poblacion.individuos[i].gen)
-        poblacion.individuos[i].tamanio = len(poblacion.individuos[i].gen)
-
-    poblacion.media = calcularMedia(poblacion)
-    calcularEsperanza(poblacion)
 
 
 class Individuo(): #Tiene tamanio,gen,aptitud,esperanza
@@ -515,8 +467,9 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 def main():
     #algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
     padre = [1,3,5,7,9,2,4,6,8]
-    madre = [1,2,3,4,5,6,7,8,9]
-    print padre, madre
-    print PMX(padre, madre)
+    #madre = [1,2,3,4,5,6,7,8,9]
+    #print padre, madre
+    #padre = creaGen(3)
+    #madre = creaGen(3)
 
 main()
