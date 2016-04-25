@@ -16,22 +16,45 @@ def seleccionarPosicionAleatoria(tamanio):
     return numpy.random.randint(tamanio)
 
 ###################################################################################
-NUMERO_GENERACIONES = 156
-TAMANIO_CUADRADO = 3
-TAMANIO_POBLACION = 36
-MEJORES_INDIVIDUOS = 5
-PROBABILIDAD_MUTA = .1
+NUMERO_GENERACIONES = 9600
+TAMANIO_CUADRADO = 5
+TAMANIO_POBLACION = 100
+MEJORES_INDIVIDUOS = 14
+PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
 SOL = False
 
 
 def funcionAptitud(gen):
-    return
+    Sn = (TAMANIO_CUADRADO*(pow(TAMANIO_CUADRADO,2)+1))/2
+    Matriz = calculaVectores(gen)
+    aptitud = 0
+    for vectores in xrange(2*(TAMANIO_CUADRADO+1)):
+        aptitud += pow( (Sn - Matriz[vectores]) ,2)
+        #aptitud += abs(Sn - Matriz[vectores])*2
+    return aptitud
 
 
-def creaGen(tamanio):
-    cuadrado = pow(tamanio,2)
+def calculaVectores(gen):
+    #Variables que guardaran la suma de cada vecto
+    Horizontal = [0]*TAMANIO_CUADRADO
+    Vertical = [0]*TAMANIO_CUADRADO
+    Diagonal_D = [0]
+    Diagonal_I = [0]
+
+    #Suma de los vectores
+    for linea in xrange(TAMANIO_CUADRADO):
+        Diagonal_I[0] += gen[linea * (TAMANIO_CUADRADO+1)]
+        Diagonal_D[0] += gen[(linea+1) * (TAMANIO_CUADRADO-1)]
+        for contador in xrange(TAMANIO_CUADRADO):
+            Horizontal[linea] += gen[contador + (linea*TAMANIO_CUADRADO)]
+            Vertical[linea] += gen[linea + (contador*TAMANIO_CUADRADO)]
+
+    return Horizontal+Vertical+Diagonal_I+Diagonal_D
+
+
+def creaGen(cuadrado):
     genotipo = []
     option = numpy.random.randint(0,3)
 
@@ -39,7 +62,7 @@ def creaGen(tamanio):
         if option == 0:
             genotipo.append(i+1)
         elif option == 1:
-            genotipo.append(pow(tamanio,2)-i)
+            genotipo.append(cuadrado-i)
         elif option == 2:
             genotipo.append(i+1)
             numpy.random.shuffle(genotipo)
@@ -136,9 +159,6 @@ def positionBased_CO(padre, madre):
             posiciones1.append(dato1)
         if( dato2 not in posiciones2 ):
             posiciones2.append(dato2)
-
-    print posiciones1
-    print posiciones2
     #Se mapean los datos del arreglo posiciones de padre
     for i in xrange(len(posiciones1)):
         hijo1[posiciones1[i]] = padre[posiciones1[i]]
@@ -157,26 +177,57 @@ def positionBased_CO(padre, madre):
     return hijo1, hijo2
 
 
-def MutaPermxInt(genoma, probabilidadMuta):
-    if(volado(probabilidadMuta)):
+def MutaPermxInt(genoma):
+    if(volado(PROBABILIDAD_MUTA)):
         posocion1 = numpy.random.randint(0,len(genoma))
         posocion2 = numpy.random.randint(0,len(genoma))
-        print posocion1,posocion2
         genoma[posocion1], genoma[posocion2] = genoma[posocion2], genoma[posocion1]
+
+
+def calcularPM(cromosoma):
+    return 1.0/len(cromosoma)
+
+
+def calcularMedia(poblacion):
+    sumaAptitudes = 0
+
+    for i in xrange(poblacion.tamanio):
+        sumaAptitudes += poblacion.individuos[i].aptitud
+
+    return (1.0/poblacion.tamanio)*sumaAptitudes
+
+
+def calcularEsperanza(poblacion): #Para maximizacion poblacion.individuos[i].esperanza = (poblacion.individuos[i].aptitud)/poblacion.media
+    poblacion.esperanzas = [] # Para limpiar esperanzas antes calculadas
+    for i in xrange(poblacion.tamanio):
+        poblacion.individuos[i].esperanza = poblacion.individuos[i].esperanza = (1- poblacion.individuos[i].aptitud)/poblacion.media#Agrega la esperanza a c/ Individuo
+        #poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
+        poblacion.esperanzas.append(poblacion.individuos[i].esperanza) #Agrega las esperanzas de los individuos a la lista de la poblacion
+
+
+def calcularDatos(poblacion):
+    poblacion.tamanio = len(poblacion.individuos)
+
+    for i in xrange(poblacion.tamanio):
+        poblacion.individuos[i].aptitud = funcionAptitud(poblacion.individuos[i].gen)
+        poblacion.individuos[i].tamanio = len(poblacion.individuos[i].gen)
+
+    poblacion.media = calcularMedia(poblacion)
+    calcularEsperanza(poblacion)
 
 
 
 class Individuo(): #Tiene tamanio,gen,aptitud,esperanza
     tamanio = 0
     gen = []
-    aptitud = 0.0
+    aptitud = 0
     esperanza = 0.0
 
 
 def creaIndividuo():
     nuevoIndividuo = Individuo()
 
-    nuevoIndividuo.tamanio = TAMANIO_GENOMA
+    nuevoIndividuo.tamanio = pow(TAMANIO_CUADRADO,2)
     nuevoIndividuo.gen = creaGen(nuevoIndividuo.tamanio)
     nuevoIndividuo.aptitud = funcionAptitud(nuevoIndividuo.gen)
 
@@ -220,7 +271,7 @@ def seleccionRuleta(poblacion):
     SumEsp = 0
     i = 0
 
-    while i <= poblacion.tamanio:
+    while i < poblacion.tamanio:
         SumEsp += poblacion.esperanzas[i]
 
         if(SumEsp > r):
@@ -246,12 +297,12 @@ def volado(numero):
         return AGUILA
     return SOL
 
-
+#Seleccion de padres
 def sobranteEstocasticoSR(poblacion):
     listaPadres = []
 
     for i in xrange(poblacion.tamanio):
-        if( poblacion.esperanzas[i] >= 1):
+        if( poblacion.esperanzas[i] >= 1 ):
             listaPadres.append(i)
 
     i=0
@@ -306,15 +357,18 @@ def cruzaPadres(poblacion, listaPadres, probabilidadCruza):
 
     for i in range(0,poblacion.tamanio,2):
         if volado( probabilidadCruza ) == AGUILA:
-            genHijo1, genHijo2 = cruza1Punto(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
-            #curza1 punto, 2 puntos, uniforme y acentuada
-
+            genHijo1, genHijo2 = ordered_CrossOver(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            #ordered_CrossOver, PMX, positionBased_CO
             hijo1 = creaIndividuoGen(genHijo1)
             hijo2 = creaIndividuoGen(genHijo2)
 
         else:
-            hijo1 = clonar(poblacion.individuos[listaPadres[i]])
-            hijo2 = clonar(poblacion.individuos[listaPadres[i+1]])
+            #hijo1 = clonar(poblacion.individuos[listaPadres[i]])
+            #hijo2 = clonar(poblacion.individuos[listaPadres[i+1]])
+            genHijo1, genHijo2 = PMX(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            hijo1 = creaIndividuoGen(genHijo1)
+            hijo2 = creaIndividuoGen(genHijo2)
+
 
         add_Individuo(nuevaPoblacion.individuos, hijo1)
         add_Individuo(nuevaPoblacion.individuos, hijo2)
@@ -334,13 +388,13 @@ def seleccionarPadres(poblacion):
     return listaPadres
 
 
-def mutacionUniforme(individuo, porcentajeMutacion):
+def mutacionUniforme(individuo, probabilidadMuta):
 
     for i in xrange(individuo.tamanio):
         r = numpy.random.uniform(0,1)
 
-        if( r <= calcularPM(individuo.gen) ):
-            individuo.gen[i] = int(not(individuo.gen[i]))
+        if( r <= probabilidadMuta ):
+            MutaPermxInt(individuo.gen)
 
 
 def mutarPoblacion(poblacion, probabilidadMuta):
@@ -371,7 +425,7 @@ def seleccionMejor(mejoresIndividuos, Elite=Poblacion()):
 
     else:
         for i in xrange(mejoresIndividuos.tamanio):
-            if( mejoresIndividuos.individuos[i].aptitud >= Elite.individuos[i].aptitud ):
+            if( mejoresIndividuos.individuos[i].aptitud <= Elite.individuos[i].aptitud ):
                 Elite.individuos[i] = mejoresIndividuos.individuos[i]
 
     return Elite
@@ -430,9 +484,10 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
     Elite = Individuo()
 
     mejoresIndividuos = elitismo(poblacion, numeroMejoresIndividuos)
+
     calcularDatos(mejoresIndividuos)
     listaPadres = []
-    while( generacionActual < numeroGeneraciones ):
+    while( 1 ):
         print "\nGeneracion Actual: ", generacionActual
 
         #listaPadres = seleccionarPadres(poblacion)
@@ -455,21 +510,15 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 
         #for i in xrange(mejoresIndividuos.tamanio):
         #    print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
-    for i in xrange(MEJORES_INDIVIDUOS):
-        x1, x2, x3, x4 = praxis_2_5(Elite.individuos[i].gen)
-        print Elite.individuos[i].aptitud*(-1), "\t|",x1,"\t\t|",x2,"\t\t|",x3,"\t\t|",x4
-    """for i in xrange(MEJORES_INDIVIDUOS):
-        x1,x2 = praxis_3_4_7(Elite.individuos[i].gen)
-        print Elite.individuos[i].aptitud*(-1), "\t|",x1,"\t\t|",x2"""
+        for i in xrange(MEJORES_INDIVIDUOS):
+            print Elite.individuos[i].gen, Elite.individuos[i].aptitud, calculaVectores(Elite.individuos[i].gen)
+        if( Elite.individuos[0].aptitud == 0):
+            break
 
 
 
 def main():
-    #algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
-    padre = [1,3,5,7,9,2,4,6,8]
-    #madre = [1,2,3,4,5,6,7,8,9]
-    #print padre, madre
-    #padre = creaGen(3)
-    #madre = creaGen(3)
+    algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
+
 
 main()
