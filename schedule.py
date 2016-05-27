@@ -18,8 +18,8 @@ def seleccionarPosicionAleatoria(tamanio):
 ###################################################################################
 NUMERO_GENERACIONES = 9600
 TAMANIO_CUADRADO = 5
-TAMANIO_POBLACION = 100
-MEJORES_INDIVIDUOS = 14
+TAMANIO_POBLACION = 350
+MEJORES_INDIVIDUOS = 20
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
 AGUILA = True
@@ -54,18 +54,18 @@ def calculaVectores(gen):
     return Horizontal+Vertical+Diagonal_I+Diagonal_D
 
 
-def creaGen(cuadrado):
+def creaGen():
     genotipo = []
-    option = numpy.random.randint(0,3)
 
-    for i in xrange(cuadrado):
-        if option == 0:
-            genotipo.append(i+1)
-        elif option == 1:
-            genotipo.append(cuadrado-i)
-        elif option == 2:
-            genotipo.append(i+1)
-            numpy.random.shuffle(genotipo)
+    while(len(genotipo) != 7):
+        asignature = numpy.random.randint(1,16)
+        if(asignature not in genotipo):
+            genotipo.append(asignature)
+
+    while(len(genotipo) != 14):
+        days = numpy.random.randint(16,33)
+        if(days not in genotipo):
+            genotipo.append(days)
 
     return genotipo
 
@@ -518,7 +518,10 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
 
 
 def main():
-    algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
+    #algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
+    print creaGen()
+
+
 
 
 main()
