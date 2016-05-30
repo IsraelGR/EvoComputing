@@ -17,57 +17,101 @@ def seleccionarPosicionAleatoria(tamanio):
 
 ###################################################################################
 NUMERO_GENERACIONES = 9600
-TAMANIO_CUADRADO = 5
 TAMANIO_POBLACION = 350
 MEJORES_INDIVIDUOS = 20
 PROBABILIDAD_MUTA = .01
 PROBABILIDAD_CRUZA = .9
+TAMANIO_GEN = 7
+MATERIAS = 15
+COMBINACIONES = 16
 AGUILA = True
 SOL = False
 
+frecuencia = [
+[2,[1,0,1,0,0]],
+[2,[1,0,0,1,0]],
+[2,[0,1,0,1,0]],
+[2,[0,1,0,0,1]],
+[2,[0,0,1,0,1]],
+[3,[1,0,1,1,0]],
+[3,[1,0,1,0,1]],
+[3,[0,1,1,0,1]],
+[3,[1,0,0,1,1]],
+[3,[0,1,0,1,1]],
+[4,[0,1,1,1,1]],
+[4,[1,0,1,1,1]],
+[4,[1,1,0,1,1]],
+[4,[1,1,1,0,1]],
+[4,[1,1,1,1,0]],
+[5,[1,1,1,1,1]]]
+
+asignaturas = [
+["Calculo",5,3,2],
+["Analisis Vectorial",6,4,1],
+["Algebra Lineal",6,3,1.5],
+["Ecuaciones Diferenciales",5,2,2.5],
+["Computo Evolutivo",2,3,3],
+["Analisis de Algoritmos",4,3,2],
+["Estructura de Datos",4,2,2],
+["Metodos Numericos",3,4,1.5],
+["Sistemas Operativos",5,5,2.5],
+["Algebra",1,2,3],
+####################NUevas asignaturas
+["Matematicas Discretas",4,3,3],
+["Seniales",4,3,1.5],
+["Bioinformatics",3,2,2],
+["Cryptography",3,2,3],
+["Ciberseguridad",5,3,2],
+["Computer Graphics",2,3,1]]
+
+def calculaCastigo(gen):
+    castigo = 0
+    for i in xrange(TAMANIO_GEN):
+        if (frecuencia[gen[i+TAMANIO_GEN]%COMBINACIONES][0] > asignaturas[gen[i]][2]):
+            cont_frec = gen[i+TAMANIO_GEN]%COMBINACIONES
+            while(frecuencia[cont_frec][0] != asignaturas[gen[i]][2]):
+                cont_frec -= 1
+                castigo += 1
+
+        elif (frecuencia[gen[i+TAMANIO_GEN]%COMBINACIONES][0] < asignaturas[gen[i]][2]):
+            cont_frec = gen[i+TAMANIO_GEN]%COMBINACIONES
+            while(frecuencia[cont_frec][0] != asignaturas[gen[i]][2]):
+                cont_frec += 1
+                castigo += 2
+
+    return castigo/2
+
+
 
 def funcionAptitud(gen):
-    Sn = (TAMANIO_CUADRADO*(pow(TAMANIO_CUADRADO,2)+1))/2
-    Matriz = calculaVectores(gen)
     aptitud = 0
-    for vectores in xrange(2*(TAMANIO_CUADRADO+1)):
-        aptitud += pow( (Sn - Matriz[vectores]) ,2)
-        #aptitud += abs(Sn - Matriz[vectores])*2
+    for i in xrange(TAMANIO_GEN):
+        aptitud += asignaturas[gen[i]%7][1]%16
+    castigo = calculaCastigo(gen)
+    aptitud = aptitud - castigo
     return aptitud
-
-
-def calculaVectores(gen):
-    #Variables que guardaran la suma de cada vecto
-    Horizontal = [0]*TAMANIO_CUADRADO
-    Vertical = [0]*TAMANIO_CUADRADO
-    Diagonal_D = [0]
-    Diagonal_I = [0]
-
-    #Suma de los vectores
-    for linea in xrange(TAMANIO_CUADRADO):
-        Diagonal_I[0] += gen[linea * (TAMANIO_CUADRADO+1)]
-        Diagonal_D[0] += gen[(linea+1) * (TAMANIO_CUADRADO-1)]
-        for contador in xrange(TAMANIO_CUADRADO):
-            Horizontal[linea] += gen[contador + (linea*TAMANIO_CUADRADO)]
-            Vertical[linea] += gen[linea + (contador*TAMANIO_CUADRADO)]
-
-    return Horizontal+Vertical+Diagonal_I+Diagonal_D
 
 
 def creaGen():
     genotipo = []
 
-    while(len(genotipo) != 7):
-        asignature = numpy.random.randint(1,16)
+    while(len(genotipo) != TAMANIO_GEN):
+        asignature = numpy.random.randint(0,MATERIAS+1)
         if(asignature not in genotipo):
             genotipo.append(asignature)
 
-    while(len(genotipo) != 14):
-        days = numpy.random.randint(16,33)
+    while(len(genotipo) != TAMANIO_GEN*2):
+        days = numpy.random.randint(MATERIAS+1,MATERIAS+COMBINACIONES+1)
         if(days not in genotipo):
             genotipo.append(days)
 
     return genotipo
+
+
+def imprimir(list):
+    print "\n"
+    for i in xrange(len(list)):
+        print list[i]
 
 
 def ordered_CrossOver(padre, madre):
@@ -94,6 +138,31 @@ def ordered_CrossOver(padre, madre):
 
     return hijo1,hijo2
 
+def mio(padre, madre):
+    hijo1 = padre
+    hijo2 = madre
+
+    tamanioPadres = len(padre)
+    comienza = seleccionarPosicionAleatoria(TAMANIO_GEN)
+    longitud = numpy.random.randint(0,TAMANIO_GEN)
+    termina = longitud+comienza
+    for aux in xrange(comienza,termina%TAMANIO_GEN):
+        hijo1[aux],hijo2[aux] = madre[aux], padre[aux]
+
+    comienza = numpy.random.randint(TAMANIO_GEN,tamanioPadres)
+    longitud = numpy.random.randint(0,TAMANIO_GEN)
+    termina = longitud+comienza
+    for i in xrange(comienza, termina):
+        hijo1[(i%TAMANIO_GEN)+TAMANIO_GEN], hijo2[(i%TAMANIO_GEN)+TAMANIO_GEN] = madre[(i%TAMANIO_GEN)+TAMANIO_GEN], padre[(i%TAMANIO_GEN)+TAMANIO_GEN]
+
+    return padre, madre
+
+
+
+
+
+
+
 
 def PMX(padre, madre):
     tamanioPadres = len(padre)
@@ -102,6 +171,7 @@ def PMX(padre, madre):
     comienza = seleccionarPosicionAleatoria(tamanioPadres)
     longitud = numpy.random.randint(0,tamanioPadres+1)
     termina = longitud+comienza
+
     hijo1 = creaHijo(tamanioPadres)
     for i in range(comienza,termina):
         hijo1[i%tamanioPadres] = madre[i%tamanioPadres]
@@ -111,6 +181,7 @@ def PMX(padre, madre):
     termina = longitud+comienza
     for i in range(comienza, termina):
         hijo2[i%tamanioPadres] = padre[i%tamanioPadres]
+
 
     #Mapea los datos de los padres a los hijos excepto los valores del mapeo anterior
     noEstadoH1 = []
@@ -126,6 +197,7 @@ def PMX(padre, madre):
         if( hijo2[i] == -1 ):
             noEstadoH2.append(i)
 
+
     #Acomodamos los numeros restantes en las posiciones vacias y de manera aleatoria
     numpy.random.shuffle(noEstadoH1)
     numpy.random.shuffle(noEstadoH2)
@@ -133,9 +205,11 @@ def PMX(padre, madre):
     posi2 = 0
 
     for dato in range(1,tamanioPadres+1):
+        print dato
         if(dato not in hijo1)and(posi1 <= len(noEstadoH1)):
             hijo1[noEstadoH1[posi1]] = dato
             posi1 += 1
+
         if(dato not in hijo2)and(posi2 <= len(noEstadoH2)):
             hijo2[noEstadoH2[posi2]] = dato
             posi2 += 1
@@ -200,8 +274,8 @@ def calcularMedia(poblacion):
 def calcularEsperanza(poblacion): #Para maximizacion poblacion.individuos[i].esperanza = (poblacion.individuos[i].aptitud)/poblacion.media
     poblacion.esperanzas = [] # Para limpiar esperanzas antes calculadas
     for i in xrange(poblacion.tamanio):
-        poblacion.individuos[i].esperanza = poblacion.individuos[i].esperanza = (1- poblacion.individuos[i].aptitud)/poblacion.media#Agrega la esperanza a c/ Individuo
-        #poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
+        #poblacion.individuos[i].esperanza = poblacion.individuos[i].esperanza = (1- poblacion.individuos[i].aptitud)/poblacion.media#Agrega la esperanza a c/ Individuo
+        poblacion.individuos[i].esperanza = poblacion.individuos[i].aptitud/poblacion.media #Agrega la esperanza a c/ Individuo
         poblacion.esperanzas.append(poblacion.individuos[i].esperanza) #Agrega las esperanzas de los individuos a la lista de la poblacion
 
 
@@ -227,8 +301,8 @@ class Individuo(): #Tiene tamanio,gen,aptitud,esperanza
 def creaIndividuo():
     nuevoIndividuo = Individuo()
 
-    nuevoIndividuo.tamanio = pow(TAMANIO_CUADRADO,2)
-    nuevoIndividuo.gen = creaGen(nuevoIndividuo.tamanio)
+    nuevoIndividuo.tamanio = TAMANIO_GEN*2
+    nuevoIndividuo.gen = creaGen()
     nuevoIndividuo.aptitud = funcionAptitud(nuevoIndividuo.gen)
 
     return nuevoIndividuo
@@ -357,17 +431,14 @@ def cruzaPadres(poblacion, listaPadres, probabilidadCruza):
 
     for i in range(0,poblacion.tamanio,2):
         if volado( probabilidadCruza ) == AGUILA:
-            genHijo1, genHijo2 = ordered_CrossOver(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
+            genHijo1, genHijo2 = mio(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
             #ordered_CrossOver, PMX, positionBased_CO
             hijo1 = creaIndividuoGen(genHijo1)
             hijo2 = creaIndividuoGen(genHijo2)
 
         else:
-            #hijo1 = clonar(poblacion.individuos[listaPadres[i]])
-            #hijo2 = clonar(poblacion.individuos[listaPadres[i+1]])
-            genHijo1, genHijo2 = PMX(poblacion.individuos[listaPadres[i]].gen, poblacion.individuos[listaPadres[i+1]].gen)
-            hijo1 = creaIndividuoGen(genHijo1)
-            hijo2 = creaIndividuoGen(genHijo2)
+            hijo1 = clonar(poblacion.individuos[listaPadres[i]])
+            hijo2 = clonar(poblacion.individuos[listaPadres[i+1]])
 
 
         add_Individuo(nuevaPoblacion.individuos, hijo1)
@@ -394,7 +465,7 @@ def mutacionUniforme(individuo, probabilidadMuta):
         r = numpy.random.uniform(0,1)
 
         if( r <= probabilidadMuta ):
-            MutaPermxInt(individuo.gen)
+            MutaPermxInt(individuo.gen)#-------------------------------------------------------------------------------------------------------------------WARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNINGWARNING
 
 
 def mutarPoblacion(poblacion, probabilidadMuta):
@@ -484,9 +555,9 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
     Elite = Individuo()
 
     mejoresIndividuos = elitismo(poblacion, numeroMejoresIndividuos)
-
     calcularDatos(mejoresIndividuos)
     listaPadres = []
+
     while( 1 ):
         print "\nGeneracion Actual: ", generacionActual
 
@@ -511,15 +582,22 @@ def algoritmoGeneticoSimple(numeroGeneraciones, porcentajeCruza, porcentajeMutac
         #for i in xrange(mejoresIndividuos.tamanio):
         #    print "Genoma = ",Elite.individuos[i].gen, "| Aptitud = ",Elite.individuos[i].aptitud
         for i in xrange(MEJORES_INDIVIDUOS):
-            print Elite.individuos[i].gen, Elite.individuos[i].aptitud, calculaVectores(Elite.individuos[i].gen)
-        if( Elite.individuos[0].aptitud == 0):
-            break
+            print Elite.individuos[i].gen, Elite.individuos[i].aptitud
 
 
 
 def main():
     #algoritmoGeneticoSimple(NUMERO_GENERACIONES, PROBABILIDAD_CRUZA, PROBABILIDAD_MUTA, MEJORES_INDIVIDUOS)
-    print creaGen()
+    gen = [6, 6, 8, 3, 9, 14, 15, 16, 19, 31, 29, 22, 30, 25]
+    for i in xrange(7):
+        print asignaturas[gen[i]]
+        print frecuencia[gen[i+7]%7]#'''
+
+
+
+
+
+
 
 
 
