@@ -2,7 +2,7 @@ import sys
 import numpy
 import math
 
-SOLUCION = [137,76,53]
+SOLUCION = [255,76,78 ]
 C = 0.83
 NUMERO_GENERACIONES = 1000
 NUMERO_VARIABLES = 3
@@ -18,11 +18,11 @@ def generarSolucionAleatorio(n_variables, limites):
 
 def calcularAptitud(gen):
     aptitud = []
-    total = 0
     for i in xrange(len(gen)):
         aptitud.append(math.sqrt(pow((SOLUCION[i]-gen[i]),2)))
-        #total += aptitud[i]
-    #aptitud.append(total)
+        # aptitud[0]: √(255-gen[i])^2
+        # aptitud[1]: √(76-gen[i])^2
+        # aptitud[2]: √(78-gen[i])^2
     return aptitud
 
 def crearPerturbacion(n_variables, media, varianza):
@@ -78,7 +78,7 @@ def estrategiaEvolutiva1_1(generaciones, gene_auto, n_variables):
 
             print "\nGeneracion Actual", generacion
             print [round(elem) for elem in x]
-            print [round(elem) for elem in fx]      
+            print [round(elem) for elem in fx]
             exito = 0.0
 
         generacion = generacion + 1
